@@ -29,7 +29,9 @@ class LoadImage:
 
     CATEGORY = "image"
 
-    RETURN_TYPES = ("IMAGE", "MASK")
+    RETURN_TYPES = ("IMAGE", "MASK", "STRING")
+    RETURN_NAMES = ("IMAGE", "MASK", "FILENAME")
+
     FUNCTION = "load_image"
     def load_image(self, image):
         image_path = folder_paths.get_annotated_filepath(image)
@@ -43,7 +45,11 @@ class LoadImage:
             mask = 1. - torch.from_numpy(mask)
         else:
             mask = torch.zeros((64,64), dtype=torch.float32, device="cpu")
-        return (image, mask.unsqueeze(0))
+
+        filename_with_extension = os.path.basename(image_path)
+        filename_without_extension = os.path.splitext(filename_with_extension)[0]
+
+        return (image, mask.unsqueeze(0), filename_without_extension)
 
     @classmethod
     def IS_CHANGED(s, image):
